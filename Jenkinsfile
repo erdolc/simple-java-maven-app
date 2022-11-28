@@ -7,6 +7,9 @@ pipeline {
                 containers:
                   - name: maven
                     image: 'maven:3-alpine'
+                    command:
+                      - cat
+                    tty: true
             '''
             defaultContainer 'maven'
         }
