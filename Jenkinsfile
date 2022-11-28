@@ -33,6 +33,8 @@ pipeline {
         stage('Docker Build') {
             steps {
                 script {
+                    def dockerHome = tool 'JenkinsDocker'
+                    env.PATH = "${dockerHome}/bin:${env.PATH}"
                     docker.build("test")
                 }
             }
