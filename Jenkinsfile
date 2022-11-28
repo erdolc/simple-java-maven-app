@@ -8,6 +8,7 @@ pipeline {
                   - name: maven
                     image: 'maven:3-alpine'
             '''
+            defaultContainer 'maven'
         }
     }
     stages {
