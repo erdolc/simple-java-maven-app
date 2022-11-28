@@ -30,5 +30,12 @@ pipeline {
                 sh 'mvn -B -DskipTests clean package'
             }
         }
+        stage('Docker Build') {
+            steps {
+                script {
+                    docker.build("test")
+                }
+            }
+        }
     }
 }
