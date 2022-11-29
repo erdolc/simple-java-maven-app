@@ -8,14 +8,29 @@ pipeline {
                   - name: maven
                     image: 'maven:3.8-jdk-8-slim'
                     command:
-                      - cat
+                    - cat
                     tty: true
+                  - name: kaniko
+                    image: gcr.io/kaniko-project/executor:debug
+                    command:
+                    - /busybox/cat
+                    tty: true
+                    volumeMounts:
+                    - name: kaniko-secret
+                      mountPath: /kaniko/.docker
+                    volumes:
+                    - name: kaniko-secret
+                      secret:
+                        secretName: registry-credentials
+                        items:
+                        - key: .dockerconfigjson
+                          path: config.json
             '''
             defaultContainer 'maven'
         }
     }
     stages {
-        stage('Test') { 
+        stage('Maven Test') { 
             steps {
                 sh 'mvn test' 
             }
@@ -25,17 +40,17 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+        stage('Maven Build') {
             steps {
                 sh 'mvn -B -DskipTests clean package'
             }
         }
         stage('Docker Build') {
-            steps {
-                script {
-                    def dockerHome = tool 'JenkinsDocker'
-                    env.PATH = "${dockerHome}/bin:${env.PATH}"
-                    docker.build("test")
+            container(name: 'kaniko', shell: '/busybox/sh') {
+                steps {
+                    script {
+                        sh "/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=docker.olcay.net/app:${env.BUILD_ID}"
+                    }
                 }
             }
         }
