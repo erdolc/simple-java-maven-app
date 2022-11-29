@@ -46,11 +46,14 @@ pipeline {
             }
         }
         stage('Docker Build') {
-            container(name: 'kaniko', shell: '/busybox/sh') {
-                steps {
-                    script {
-                        sh "/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=docker.olcay.net/app:${env.BUILD_ID}"
-                    }
+            agent { 
+                kubernetes {
+                    defaultContainer 'kaniko'
+                }
+            }
+            steps {
+                script {
+                    sh "/kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=docker.olcay.net/app:${env.BUILD_ID}"
                 }
             }
         }
