@@ -18,13 +18,13 @@ pipeline {
                     volumeMounts:
                     - name: kaniko-secret
                       mountPath: /kaniko/.docker
-                    volumes:
-                    - name: kaniko-secret
-                      secret:
-                        secretName: registry-credentials
-                        items:
-                        - key: .dockerconfigjson
-                          path: config.json
+                volumes:
+                - name: kaniko-secret
+                  secret:
+                    secretName: registry-credentials
+                    items:
+                    - key: .dockerconfigjson
+                      path: config.json
             '''
             defaultContainer 'maven'
         }
